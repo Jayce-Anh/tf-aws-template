@@ -1,0 +1,55 @@
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - apt install jq -y
+      - export COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-8)
+      - echo "Deploying commit -> $COMMIT_HASH"
+      - echo "Working directory -> $(pwd)"
+      - ls -la
+      - export REGISTRY_URL=${REGISTRY_URL}
+      - echo "Registry URL -> $REGISTRY_URL"
+      - export REGION=${REGION}
+      - echo "Region -> $REGION"
+      # - export PARAMETER_STORE=${PARAMETER_STORE}
+      # - echo $PARAMETER_STORE
+      - export SECRET_MANAGER=${SECRET_MANAGER}
+      - echo "Secret Manager -> $SECRET_MANAGER"
+      - export CONTAINER_NAME=${CONTAINER_NAME}
+      - echo "Container Name -> $CONTAINER_NAME"
+      - export ECS_CLUSTER_NAME=${ECS_CLUSTER_NAME}
+      - echo "ECS Cluster -> $ECS_CLUSTER_NAME"
+      - export SERVICE=${SERVICE}
+      - echo "Service -> $SERVICE"
+      - export ECR_IMAGE_TAG=${ECR_IMAGE_TAG}
+      - echo "ECR Image Tag -> $ECR_IMAGE_TAG"
+  build:
+    on-failure: ABORT
+    commands:
+      - echo Build ${SERVICE} with COMMIT-ID ${COMMIT_HASH} started on `date`
+      - aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${REGISTRY_URL}
+      # - echo "Getting environment variables from Parameter Store..."
+      # - aws ssm get-parameter --name ${SSM_ENV} --region ${REGION} --with-decryption --output text --query Parameter.Value > .env
+      - echo "Getting environment variables from Secret Manager..."
+      - aws secretsmanager get-secret-value --secret-id ${SECRET_MANAGER} --region ${REGION} --query SecretString --output text | jq -r 'to_entries[] | "\(.key)=\(.value)"' > .env
+      - cat .env
+      - docker build -t ${REGISTRY_URL}:${COMMIT_HASH} .
+      - docker tag ${REGISTRY_URL}:${COMMIT_HASH} ${REGISTRY_URL}:latest
+      - echo "Pushing images to ECR..."
+      - docker push ${REGISTRY_URL}:${COMMIT_HASH}
+      - docker push ${REGISTRY_URL}:latest
+
+  post_build:
+    commands:
+      - echo "updating image tag date"
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REGISTRY_URL:$COMMIT_HASH > artifact.json
+      - cat artifact.json
+artifacts:
+  files:
+    - artifact.json
+  name: artifacts
