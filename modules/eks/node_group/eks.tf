@@ -28,6 +28,16 @@ resource "aws_eks_cluster" "eks" {
     aws_iam_role_policy_attachment.eks_vpc,
   ]
 
+  # Increase timeout for cluster deletion to allow node groups time to fully terminate
+  # This helps prevent "ResourceInUseException: Cluster has nodegroups attached" errors
+  timeouts {
+    delete = "10m"
+  }
+
+  lifecycle {
+    create_before_destroy = false
+  }
+
   tags = merge(var.tags, {
     Name = "${var.project.env}-${var.project.name}-eks-cluster"
   })

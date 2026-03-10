@@ -21,7 +21,7 @@ data "aws_eks_addon_version" "ebs_csi_driver" {
   most_recent        = true
 }
 
-# ------- EKS ADDONS -------
+# -------------------------- EKS ADDONS --------------------------
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.eks.name
   addon_name   = "vpc-cni"
@@ -37,9 +37,10 @@ resource "aws_eks_addon" "coredns" {
   addon_name   = "coredns"
   addon_version = data.aws_eks_addon_version.coredns.version
   
-  # CoreDNS can depend on VPC CNI but not on node groups
+  # CoreDNS needs healthy nodes to run
   depends_on = [
-    aws_eks_addon.vpc_cni
+    aws_eks_addon.vpc_cni,
+    aws_eks_node_group.node_groups
   ]
 }
 
@@ -47,7 +48,6 @@ resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.eks.name
   addon_name   = "kube-proxy"
   addon_version = data.aws_eks_addon_version.kube_proxy.version
-  
 
   depends_on = [
     aws_eks_cluster.eks
@@ -62,12 +62,9 @@ resource "aws_eks_addon" "aws_ebs_csi_driver" {
 
   depends_on = [
     aws_eks_cluster.eks,
-    aws_iam_openid_connect_provider.eks
+    aws_iam_openid_connect_provider.eks,
+    aws_eks_node_group.node_groups
   ]
-
-  tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-${var.eks_name}-ebs-csi-driver"
-  })
 }
 
 #-------- Extra addons -------

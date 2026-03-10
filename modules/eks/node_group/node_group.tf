@@ -55,7 +55,7 @@ resource "aws_eks_node_group" "node_groups" {
     aws_eks_addon.kube_proxy,
   ]
 
-  tags = merge(var.project, lookup(each.value, "tags", {}))
+  tags = merge(var.tags, lookup(each.value, "tags", {}))
 }
 
 #-------------------------- Node Group Launch Template--------------------------
@@ -65,7 +65,7 @@ resource "aws_launch_template" "node_groups" {
   name          = format("%s-%s-eks-node-group", var.eks_name, each.key)
   user_data     = can(data.cloudinit_config.node_groups[each.key]) ? data.cloudinit_config.node_groups[each.key].rendered : null
   instance_type = lookup(each.value, "instance_types", null) != null ? null : lookup(each.value, "instance_type", null)
-  key_name      = lookup(each.value, "key_name", null)
+  key_name      = lookup(each.value, "key_name", null) 
 
 #Block Device Mappings
   block_device_mappings {
@@ -101,7 +101,7 @@ resource "aws_launch_template" "node_groups" {
       lookup(each.value, "security_group_ids", []),
     ))
     delete_on_termination       = true
-    associate_public_ip_address = lookup(each.value, "associate_public_ip_address", false)
+    associate_public_ip_address = lookup(each.value, "associate_public_ip_address", true)
   }
 
 #Metadata Options
@@ -119,15 +119,35 @@ resource "aws_launch_template" "node_groups" {
     content {
       resource_type = tag_specifications.value
 
-      tags = merge(var.project, lookup(each.value, "tags", {}), {
-        Name = format("%s-eks-%s-node-group", var.eks_name, each.key)
+      tags = merge(var.tags, lookup(each.value, "tags", {}), {
+        LaunchTemplate = format("%s-eks-%s-node-group", var.eks_name, each.key)
       })
     }
   }
 
-  tags = merge(var.project, {
+  tags = merge(var.tags, {
     Name = format("%s-eks-%s-node-group", var.eks_name, each.key)
   })
+}
+
+#-------------------------- ALB Controller Service Account --------------------------
+resource "kubernetes_service_account" "alb_controller" {
+  metadata {
+    name      = "aws-load-balancer-controller"
+    namespace = "kube-system"
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.alb_controller.arn
+    }
+    labels = {
+      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
+      "app.kubernetes.io/component" = "controller"
+    }
+  }
+
+  depends_on = [
+    aws_eks_node_group.node_groups,
+    aws_iam_role_policy_attachment.alb_controller,
+  ]
 }
 
 #-------------------------- Node Group Cloud-Init Config--------------------------

@@ -68,15 +68,6 @@ variable "cluster_sg_ids"{
   default = [] 
 }
 
-variable "map_users" {
-  description = "A list of aws-auth config-map"
-  type = list(object({
-    userarn  = string
-    username = string
-    groups   = list(string)
-  }))
-  default = []
-}
 
 variable "vpc_id" {
   type = string

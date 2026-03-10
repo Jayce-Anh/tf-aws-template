@@ -1,5 +1,6 @@
 ##################################### FARGATE RBAC #########################################
 #----------- Provider -----------
+# Still needed for kubernetes_service_account in fargate_profile.tf
 provider "kubernetes" {
   host                   = aws_eks_cluster.eks.endpoint
   cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
@@ -16,30 +17,25 @@ data "aws_eks_cluster_auth" "cluster" {
   name = aws_eks_cluster.eks.name
 }
 
-#----------- Config Map -----------
-# Maps AWS IAM roles to Kubernetes permissions in kube-system namespace
+# Fargate execution role access entry (must be created manually - AWS does NOT auto-create this)
+resource "aws_eks_access_entry" "fargate" {
+  cluster_name  = aws_eks_cluster.eks.name
+  principal_arn = aws_iam_role.eks_fargate.arn
+  type          = "FARGATE_LINUX"
 
-resource "kubernetes_config_map_v1" "aws_auth" {
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
+  depends_on = [
+    aws_eks_cluster.eks
+  ]
+}
 
-  data = {
-    mapRoles = yamlencode(concat(
-      var.map_roles,
-      [{
-        rolearn  = aws_iam_role.eks_fargate.arn
-        username = "system:node:{{SessionName}}"
-        groups = [
-          "system:bootstrappers",
-          "system:nodes",
-          "system:node-proxier"
-        ]
-      }]
-    ))
-    mapUsers = yamlencode(var.map_users)
-  }
+# Additional access entries for custom roles
+resource "aws_eks_access_entry" "additional_roles" {
+  for_each = { for idx, role in var.map_roles : idx => role }
+
+  cluster_name      = aws_eks_cluster.eks.name
+  principal_arn     = each.value.rolearn
+  kubernetes_groups = each.value.groups
+  type              = "STANDARD"
 
   depends_on = [
     aws_eks_cluster.eks

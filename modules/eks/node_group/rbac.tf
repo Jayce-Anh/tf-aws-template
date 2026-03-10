@@ -13,18 +13,8 @@ locals {
   ))
 }
 
-# Using EKS access entries instead of aws-auth ConfigMap (modern approach)
-resource "aws_eks_access_entry" "node_group" {
-  cluster_name      = aws_eks_cluster.eks.name
-  principal_arn     = aws_iam_role.node_group.arn
-  kubernetes_groups = ["system:bootstrappers", "system:nodes"]
-  type             = "EC2_LINUX"
-
-  depends_on = [
-    aws_eks_cluster.eks,
-    aws_eks_node_group.node_groups
-  ]
-}
+# Note: EC2_LINUX access entry for the node group role is auto-created by AWS
+# when the managed node group is provisioned. No manual resource needed.
 
 # Additional access entries for custom roles
 resource "aws_eks_access_entry" "additional_roles" {
