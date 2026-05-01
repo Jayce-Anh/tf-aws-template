@@ -61,8 +61,8 @@ resource "aws_eks_node_group" "node_groups" {
 #-------------------------- Node Group Launch Template--------------------------
 resource "aws_launch_template" "node_groups" {
   for_each = var.node_groups
-
   name          = format("%s-%s-eks-node-group", var.eks_name, each.key)
+  # name_prefix   = format("%s-%s-eks-node-group-", var.eks_name, each.key)
   user_data     = can(data.cloudinit_config.node_groups[each.key]) ? data.cloudinit_config.node_groups[each.key].rendered : null
   instance_type = lookup(each.value, "instance_types", null) != null ? null : lookup(each.value, "instance_type", null)
   key_name      = lookup(each.value, "key_name", null) 
@@ -128,26 +128,10 @@ resource "aws_launch_template" "node_groups" {
   tags = merge(var.tags, {
     Name = format("%s-eks-%s-node-group", var.eks_name, each.key)
   })
-}
 
-#-------------------------- ALB Controller Service Account --------------------------
-resource "kubernetes_service_account" "alb_controller" {
-  metadata {
-    name      = "aws-load-balancer-controller"
-    namespace = "kube-system"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.alb_controller.arn
-    }
-    labels = {
-      "app.kubernetes.io/name"      = "aws-load-balancer-controller"
-      "app.kubernetes.io/component" = "controller"
-    }
+  lifecycle {
+    create_before_destroy = true
   }
-
-  depends_on = [
-    aws_eks_node_group.node_groups,
-    aws_iam_role_policy_attachment.alb_controller,
-  ]
 }
 
 #-------------------------- Node Group Cloud-Init Config--------------------------

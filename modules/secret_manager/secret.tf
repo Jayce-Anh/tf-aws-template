@@ -12,7 +12,7 @@ resource "aws_secretsmanager_secret" "secret" {
   })
 }
 
-#Create secret version with initial value (changes ignored)
+# Create empty secret manager 
 resource "aws_secretsmanager_secret_version" "secret_with_ignore" {
   for_each = {
     for k, v in var.secrets : k => v
@@ -27,7 +27,7 @@ resource "aws_secretsmanager_secret_version" "secret_with_ignore" {
   }
 }
 
-#Create secret version with managed value (changes not ignored)
+# Create secret manager with managed value
 resource "aws_secretsmanager_secret_version" "secret_managed" {
   for_each = {
     for k, v in var.secrets : k => v

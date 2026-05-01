@@ -5,7 +5,7 @@ resource "aws_cloudwatch_log_group" "this" {
   for_each = var.log_groups
 
   name              = each.value.name
-  retention_in_days = lookup(each.value, "retention_in_days", var.default_log_retention)
+  retention_in_days = coalesce(each.value.retention_in_days, var.default_log_retention)
   kms_key_id        = lookup(each.value, "kms_key_id", null)
 
   tags = merge(var.tags, lookup(each.value, "tags", {}))
@@ -20,10 +20,10 @@ resource "aws_cloudwatch_log_metric_filter" "this" {
   log_group_name = each.value.log_group_name
 
   metric_transformation {
-    name      = each.value.metric_transformation.name
-    namespace = each.value.metric_transformation.namespace
-    value     = each.value.metric_transformation.value
-    unit      = lookup(each.value.metric_transformation, "unit", "None")
+    name          = each.value.metric_transformation.name
+    namespace     = each.value.metric_transformation.namespace
+    value         = each.value.metric_transformation.value
+    unit          = lookup(each.value.metric_transformation, "unit", "None")
     default_value = lookup(each.value.metric_transformation, "default_value", null)
   }
 }

@@ -1,8 +1,8 @@
 variable "project" {
   type = object({
-    name = string
-    env = string
-    region = string
+    name        = string
+    env         = string
+    region      = string
     account_ids = list(string)
   })
 }
@@ -64,82 +64,4 @@ variable "subnet_ids" {
 
 variable "vpc_id" {
   type = string
-}
-
-variable "enable_cloudwatch" {
-  type        = bool
-  default     = false
-  description = "Enable CloudWatch alarms and dashboard for Redis"
-}
-
-variable "cloudwatch_alarms" {
-  type = object({
-    cpu_high = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    memory_high = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    evictions = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    swap_usage_high = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    connections_high = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    cache_hit_rate_low = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    alarm_actions = list(string)
-    ok_actions    = list(string)
-  })
-  default = {
-    cpu_high = {
-      threshold          = 75
-      evaluation_periods = 2
-      period             = 300
-    }
-    memory_high = {
-      threshold          = 90
-      evaluation_periods = 2
-      period             = 300
-    }
-    evictions = {
-      threshold          = 100
-      evaluation_periods = 1
-      period             = 300
-    }
-    swap_usage_high = {
-      threshold          = 52428800  # 50 MB in bytes
-      evaluation_periods = 2
-      period             = 300
-    }
-    connections_high = {
-      threshold          = 10000
-      evaluation_periods = 2
-      period             = 300
-    }
-    cache_hit_rate_low = {
-      threshold          = 80  # 80%
-      evaluation_periods = 2
-      period             = 300
-    }
-    alarm_actions = []
-    ok_actions    = []
-  }
-  description = "CloudWatch alarm configuration for Redis/ElastiCache"
 }

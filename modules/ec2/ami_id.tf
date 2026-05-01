@@ -51,7 +51,7 @@ data "aws_ami" "al2023-ami" {
   owners      = ["amazon"]
   filter {
     name   = "name"
-    values = ["amzn2023-ami-hvm*"]
+    values = ["al2023-ami-*-x86_64"]
   }
   filter {
     name   = "architecture"

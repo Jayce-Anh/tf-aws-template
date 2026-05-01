@@ -17,7 +17,7 @@ data "aws_eks_cluster_auth" "cluster" {
   name = aws_eks_cluster.eks.name
 }
 
-# Fargate execution role access entry (must be created manually - AWS does NOT auto-create this)
+# Fargate execution role access entry 
 resource "aws_eks_access_entry" "fargate" {
   cluster_name  = aws_eks_cluster.eks.name
   principal_arn = aws_iam_role.eks_fargate.arn

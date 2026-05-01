@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_description   = lookup(each.value, "alarm_description", null)
   treat_missing_data  = lookup(each.value, "treat_missing_data", "notBreaching")
   datapoints_to_alarm = lookup(each.value, "datapoints_to_alarm", null)
-  
+
   dimensions = lookup(each.value, "dimensions", {})
 
   alarm_actions             = lookup(each.value, "alarm_actions", [])
@@ -29,10 +29,10 @@ resource "aws_cloudwatch_metric_alarm" "this" {
 resource "aws_cloudwatch_composite_alarm" "this" {
   for_each = var.composite_alarms
 
-  alarm_name          = each.value.alarm_name
-  alarm_description   = lookup(each.value, "alarm_description", null)
-  alarm_rule          = each.value.alarm_rule
-  actions_enabled     = lookup(each.value, "actions_enabled", true)
+  alarm_name        = each.value.alarm_name
+  alarm_description = lookup(each.value, "alarm_description", null)
+  alarm_rule        = each.value.alarm_rule
+  actions_enabled   = lookup(each.value, "actions_enabled", true)
 
   alarm_actions             = lookup(each.value, "alarm_actions", [])
   ok_actions                = lookup(each.value, "ok_actions", [])

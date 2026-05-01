@@ -9,22 +9,22 @@ variable "tags" {
 #----------------------- Alarms -----------------------
 variable "alarms" {
   type = map(object({
-    alarm_name          = string
-    comparison_operator = string
-    evaluation_periods  = number
-    metric_name         = string
-    namespace           = string
-    period              = number
-    statistic           = string
-    threshold           = number
-    alarm_description   = optional(string)
-    treat_missing_data  = optional(string)
-    datapoints_to_alarm = optional(number)
-    dimensions          = optional(map(string))
-    alarm_actions       = optional(list(string))
-    ok_actions          = optional(list(string))
-    insufficient_data_actions = optional(list(string))
-    tags                = optional(map(string))
+    alarm_name                = string
+    comparison_operator       = string
+    evaluation_periods        = number
+    metric_name               = string
+    namespace                 = string
+    period                    = number
+    statistic                 = string
+    threshold                 = number
+    alarm_description         = optional(string)
+    treat_missing_data        = optional(string, "notBreaching")
+    datapoints_to_alarm       = optional(number)
+    dimensions                = optional(map(string), {})
+    alarm_actions             = optional(list(string), [])
+    ok_actions                = optional(list(string), [])
+    insufficient_data_actions = optional(list(string), [])
+    tags                      = optional(map(string), {})
   }))
   default     = {}
   description = "Map of CloudWatch metric alarms to create"
@@ -33,14 +33,14 @@ variable "alarms" {
 #----------------------- Composite Alarms -----------------------
 variable "composite_alarms" {
   type = map(object({
-    alarm_name          = string
-    alarm_rule          = string
-    alarm_description   = optional(string)
-    actions_enabled     = optional(bool)
-    alarm_actions       = optional(list(string))
-    ok_actions          = optional(list(string))
-    insufficient_data_actions = optional(list(string))
-    tags                = optional(map(string))
+    alarm_name                = string
+    alarm_rule                = string
+    alarm_description         = optional(string)
+    actions_enabled           = optional(bool, true)
+    alarm_actions             = optional(list(string), [])
+    ok_actions                = optional(list(string), [])
+    insufficient_data_actions = optional(list(string), [])
+    tags                      = optional(map(string), {})
   }))
   default     = {}
   description = "Map of CloudWatch composite alarms to create"
@@ -62,7 +62,7 @@ variable "log_groups" {
     name              = string
     retention_in_days = optional(number)
     kms_key_id        = optional(string)
-    tags              = optional(map(string))
+    tags              = optional(map(string), {})
   }))
   default     = {}
   description = "Map of CloudWatch log groups to create"
@@ -84,7 +84,7 @@ variable "log_metric_filters" {
       name          = string
       namespace     = string
       value         = string
-      unit          = optional(string)
+      unit          = optional(string, "None")
       default_value = optional(number)
     })
   }))
@@ -95,20 +95,20 @@ variable "log_metric_filters" {
 #----------------------- Log-based Alarms -----------------------
 variable "log_based_alarms" {
   type = map(object({
-    alarm_name          = string
-    comparison_operator = string
-    evaluation_periods  = number
-    metric_name         = string
-    namespace           = string
-    period              = number
-    statistic           = string
-    threshold           = number
-    alarm_description   = optional(string)
-    treat_missing_data  = optional(string)
-    alarm_actions       = optional(list(string))
-    ok_actions          = optional(list(string))
-    insufficient_data_actions = optional(list(string))
-    tags                = optional(map(string))
+    alarm_name                = string
+    comparison_operator       = string
+    evaluation_periods        = number
+    metric_name               = string
+    namespace                 = string
+    period                    = number
+    statistic                 = string
+    threshold                 = number
+    alarm_description         = optional(string)
+    treat_missing_data        = optional(string, "notBreaching")
+    alarm_actions             = optional(list(string), [])
+    ok_actions                = optional(list(string), [])
+    insufficient_data_actions = optional(list(string), [])
+    tags                      = optional(map(string), {})
   }))
   default     = {}
   description = "Map of alarms based on log metric filters"

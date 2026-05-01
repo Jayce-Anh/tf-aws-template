@@ -1,9 +1,9 @@
 #----------------Project------------------#
- variable "project" {
+variable "project" {
   type = object({
-    name = string
-    env  = string
-    region = string
+    name        = string
+    env         = string
+    region      = string
     account_ids = list(string)
   })
 }
@@ -34,8 +34,8 @@ variable "volume_size" {
 }
 
 variable "enabled_eip" {
-  type    = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Attach Elastic IP to single EC2 instance"
 }
 
@@ -67,12 +67,12 @@ variable "alb_sg_id" {
 # }
 
 variable "path_user_data" {
-  type = string
+  type        = string
   description = "Path to user data"
 }
 
 variable "key_name" {
-  type = string
+  type        = string
   description = "Name of the key pair"
 }
 
@@ -83,104 +83,31 @@ variable "key_name" {
 
 variable "sg_ingress" {
   type = map(object({
-    from_port      = number
-    to_port        = number
-    protocol       = string
-    description    = string
+    from_port                = number
+    to_port                  = number
+    protocol                 = string
+    description              = string
     source_security_group_id = optional(string, null)
-    cidr_blocks = optional(list(string), ["0.0.0.0/0"])
+    cidr_blocks              = optional(list(string), ["0.0.0.0/0"])
   }))
   description = "Map of ingress rules for EC2 security group"
 }
 
 variable "sg_egress" {
   type = map(object({
-    from_port   = optional(number, 0)
-    to_port     = optional(number, 0)
-    protocol    = optional(string, "-1")
-    description = optional(string, "Allow outbound access")
-    cidr_blocks = optional(list(string), ["0.0.0.0/0"])
+    from_port                = optional(number, 0)
+    to_port                  = optional(number, 0)
+    protocol                 = optional(string, "-1")
+    description              = optional(string, "Allow outbound access")
+    cidr_blocks              = optional(list(string), ["0.0.0.0/0"])
     source_security_group_id = optional(string, null)
   }))
-  description = "Map of egress rules for EC2 security group"
-}
-
-variable "enable_cloudwatch" {
-  type        = bool
-  default     = false
-  description = "Enable CloudWatch alarms and dashboard for EC2"
-}
-
-variable "cloudwatch_alarms" {
-  type = object({
-    cpu_high = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    status_check_failed = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    instance_status_check_failed = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    system_status_check_failed = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    disk_read_ops_high = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    disk_write_ops_high = object({
-      threshold          = number
-      evaluation_periods = number
-      period             = number
-    })
-    alarm_actions = list(string)
-    ok_actions    = list(string)
-  })
   default = {
-    cpu_high = {
-      threshold          = 80
-      evaluation_periods = 2
-      period             = 300
+    all = {
+      description = "Allow all outbound"
     }
-    status_check_failed = {
-      threshold          = 0
-      evaluation_periods = 2
-      period             = 60
-    }
-    instance_status_check_failed = {
-      threshold          = 0
-      evaluation_periods = 2
-      period             = 60
-    }
-    system_status_check_failed = {
-      threshold          = 0
-      evaluation_periods = 2
-      period             = 60
-    }
-    disk_read_ops_high = {
-      threshold          = 1000
-      evaluation_periods = 2
-      period             = 300
-    }
-    disk_write_ops_high = {
-      threshold          = 1000
-      evaluation_periods = 2
-      period             = 300
-    }
-    alarm_actions = []
-    ok_actions    = []
   }
-  description = "CloudWatch alarm configuration for EC2 instance"
+  description = "Map of egress rules for EC2 security group"
 }
 
 #---------------------Auto Scaling Group---------------------#
