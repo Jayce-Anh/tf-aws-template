@@ -18,7 +18,7 @@ resource "aws_codepipeline" "codepipeline" {
     type     = "S3"
   }
 
-#Source Stage
+  #Source Stage
   stage {
     name = "Source"
 
@@ -39,7 +39,7 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 
-#Build Stage
+  #Build Stage
   stage {
     name = "Build"
 
@@ -53,12 +53,12 @@ resource "aws_codepipeline" "codepipeline" {
       version          = "1"
 
       configuration = {
-        ProjectName = var.project_name 
+        ProjectName = var.project_name
       }
     }
   }
 
-#Conditional Deploy Stage (only for ECS deployments)
+  #Conditional Deploy Stage (only for ECS deployments)
   dynamic "stage" {
     for_each = var.enable_ecs_deploy ? [1] : []
     content {
@@ -72,33 +72,33 @@ resource "aws_codepipeline" "codepipeline" {
         version         = "1"
         configuration = {
           DeploymentTimeout = "20"
-          ClusterName = var.ecs_cluster_name
-          ServiceName = var.ecs_service_name
-          FileName    = "artifact.json"
+          ClusterName       = var.ecs_cluster_name
+          ServiceName       = var.ecs_service_name
+          FileName          = "artifact.json"
         }
       }
     }
   }
 
-# #Deploy Stage (CodeDeploy)
-#   stage {
-#     name = "Deploy"
+  # #Deploy Stage (CodeDeploy)
+  #   stage {
+  #     name = "Deploy"
 
-#     action {
-#       name             = "Deploy"
-#       category         = "Deploy"
-#       owner            = "AWS"
-#       provider         = "CodeDeploy"
-#       input_artifacts  = ["Build_Artifacts"]
-#       output_artifacts = ["Deploy_Artifacts"]
-#       version          = "1"
+  #     action {
+  #       name             = "Deploy"
+  #       category         = "Deploy"
+  #       owner            = "AWS"
+  #       provider         = "CodeDeploy"
+  #       input_artifacts  = ["Build_Artifacts"]
+  #       output_artifacts = ["Deploy_Artifacts"]
+  #       version          = "1"
 
-#       configuration = {
-#         ApplicationName = var.application_name # CodeDeploy application name
-#         DeploymentGroupName = var.deployment_group_name # CodeDeploy deployment group name
-#       }
-#     }
-#   }
+  #       configuration = {
+  #         ApplicationName = var.application_name # CodeDeploy application name
+  #         DeploymentGroupName = var.deployment_group_name # CodeDeploy deployment group name
+  #       }
+  #     }
+  #   }
 
 }
 
@@ -106,13 +106,6 @@ resource "aws_codepipeline" "codepipeline" {
 # CodePipeline to authenticate the request came from GitHub.
 # Would probably be better to pull this from the environment
 # or something like SSM Parameter Store.
-
-#-------------------------- Integrate CodePipeline with GitHub --------------------------
-#Connect to GitHub with OAuth Token
-provider "github" {
-  token = var.git_token
-  owner = var.git_org
-}
 
 #Generate a random secret token for the CodePipeline webhook
 resource "random_string" "secret_token" {

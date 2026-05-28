@@ -17,12 +17,12 @@ output "cluster_name" {
 
 output "cloudwatch_log_group_name" {
   description = "Name of CloudWatch log group created"
-  value       = {for k, v in aws_cloudwatch_log_group.be_log_group: k => v.name}
+  value       = { for k, v in aws_cloudwatch_log_group.be_log_group : k => v.name }
 }
 
 output "cloudwatch_log_group_arn" {
   description = "ARN of CloudWatch log group created"
-  value       = {for k, v in aws_cloudwatch_log_group.be_log_group: k => v.arn}
+  value       = { for k, v in aws_cloudwatch_log_group.be_log_group : k => v.arn }
 }
 
 output "task_exec_iam_role_name" {
@@ -32,15 +32,15 @@ output "task_exec_iam_role_name" {
 
 output "ecs_tasks_sg_id" {
   description = "ECS task security group"
-  value = aws_security_group.ecs_tasks.id
+  value       = aws_security_group.ecs_tasks.id
 }
 
 output "ecs_tasks_without_ALB_sg_id" {
   description = "ECS task security group"
-  value = aws_security_group.ecs_tasks_without_ALB.id
+  value       = aws_security_group.ecs_tasks_without_ALB.id
 }
 
 output "service_name" {
   description = "Map of ECS service names"
-  value = {for k, v in aws_ecs_service.service : k => v.name}
+  value       = { for k, v in aws_ecs_service.service : k => v.name }
 }

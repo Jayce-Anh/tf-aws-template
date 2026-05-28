@@ -12,7 +12,7 @@
 **/terraform.tfstate.backup
 
 # Ignore sensitive variable files
-#**/terraform.tfvars 
+# **/terraform.tfvars 
 **/*.auto.tfvars
 **/secrets.tfvars
 

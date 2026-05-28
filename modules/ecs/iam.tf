@@ -37,25 +37,25 @@ resource "aws_iam_role" "ecsTaskRole" {
 #--------------ECS task role policy ----------------
 resource "aws_iam_policy" "ecs_task_role_policy" {
   name = "${var.project.env}-${var.project.name}-ecs_exec_policy"
- 
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = ["ssmmessages:CreateControlChannel",
-                    "ssmmessages:CreateDataChannel",
-                    "ssmmessages:OpenControlChannel",
-                    "ssmmessages:OpenDataChannel"
-                    ]
+        Action = ["ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
         Effect   = "Allow"
         Resource = "*"
       },
       {
-        Action   = ["logs:CreateLogStream",
-                    "logs:DescribeLogStreams",
-                    "logs:PutLogEvents"
-                    ]
-        Effect   = "Allow"
+        Action = ["logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents"
+        ]
+        Effect = "Allow"
         # Use the first account ID from the project configuration
         Resource = "arn:aws:logs:${var.project.region}:${var.project.account_ids[0]}:log-group:/ecs/*"
       },

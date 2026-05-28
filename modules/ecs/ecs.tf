@@ -6,28 +6,10 @@ resource "aws_ecs_cluster" "ecs_cluster" {
     name  = "containerInsights"
     value = var.containerInsights
   }
-  
+
   tags = merge(var.tags, {
     Name = "${var.project.env}-${var.project.name}-ecs-cluster"
   })
-}
-
-#--------------ECS task template ----------------
-data "template_file" "task_definitions" {
-  for_each = var.task_definitions
-  template = file("${path.module}/container_def.json.tpl")
-  vars = {
-    region              = "${var.project.region}"
-    env                 = "${var.project.env}"
-    project             = "${var.project.name}"
-    container_name      = "${each.value.container_name}"
-    container_image     = "${each.value.container_image}"
-    cpu                 = "${each.value.cpu}"
-    memory              = "${each.value.memory}"
-    container_port      = "${each.value.container_port}"
-    host_port           = "${each.value.host_port}"
-    health_check_path   = "${each.value.health_check_path}"
-  }
 }
 
 #--------------ECS task definition ----------------
@@ -37,27 +19,38 @@ resource "aws_ecs_task_definition" "ecs_task" {
   }
   family                   = "${var.project.env}-${var.project.name}-${each.value.container_name}-task"
   execution_role_arn       = aws_iam_role.ecsTaskExecutionRole.arn
-  task_role_arn            = aws_iam_role.ecsTaskRole.arn 
+  task_role_arn            = aws_iam_role.ecsTaskRole.arn
   network_mode             = var.network_mode
   requires_compatibilities = ["FARGATE"]
   cpu                      = each.value.cpu
   memory                   = each.value.memory
-  container_definitions    = data.template_file.task_definitions[each.key].rendered
+  container_definitions = templatefile("${path.module}/container_def.json.tpl", {
+    region            = var.project.region
+    env               = var.project.env
+    project           = var.project.name
+    container_name    = each.value.container_name
+    container_image   = each.value.container_image
+    cpu               = each.value.cpu
+    memory            = each.value.memory
+    container_port    = each.value.container_port
+    host_port         = each.value.host_port
+    health_check_path = each.value.health_check_path
+  })
 }
 
 #-------------- ECS service ----------------
 resource "aws_ecs_service" "service" {
   for_each = var.task_definitions
 
-  name            = "${var.project.env}-${var.project.name}-${each.value.container_name}-service"
-  cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.ecs_task[each.key].arn
-  desired_count   = each.value.desired_count
-  launch_type     = "FARGATE"
+  name                   = "${var.project.env}-${var.project.name}-${each.value.container_name}-service"
+  cluster                = aws_ecs_cluster.ecs_cluster.id
+  task_definition        = aws_ecs_task_definition.ecs_task[each.key].arn
+  desired_count          = each.value.desired_count
+  launch_type            = "FARGATE"
   enable_execute_command = true
 
   # Add health check grace period for ALB
-  health_check_grace_period_seconds = 180  # 3 minutes for container to start
+  health_check_grace_period_seconds = 180 # 3 minutes for container to start
 
   # Force replacement when network configuration changes
   lifecycle {
@@ -75,7 +68,7 @@ resource "aws_ecs_service" "service" {
     for_each = each.value.load_balancer != null ? [each.value.load_balancer] : []
 
     content {
-      target_group_arn = var.target_group_arn 
+      target_group_arn = var.target_group_arn
       container_name   = "${var.project.env}-${var.project.name}-${each.value.container_name}"
       container_port   = each.value.load_balancer.container_port
     }

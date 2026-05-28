@@ -8,9 +8,9 @@ variable "pipeline_name" {}
 
 variable "project" {
   type = object({
-    name       = string
-    env        = string
-    region     = string
+    name        = string
+    env         = string
+    region      = string
     account_ids = list(string)
   })
 }
@@ -23,7 +23,7 @@ variable "tags" {
 
 variable "project_name" {
   description = "The name of the code build project"
-  type = string
+  type        = string
 }
 
 # variable "application_name" {

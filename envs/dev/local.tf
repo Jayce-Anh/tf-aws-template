@@ -1,10 +1,10 @@
 locals {
   # Project configuration
   project = {
-    name       = "todo"
-    env        = "dev"
-    region     = "us-east-1"
-    account_ids = ["701604998432", "926379876634"]
+    name       = "eks"
+    env        = "test"
+    region     = "ap-southeast-1"
+    account_ids = ["701604998432"]
   }
   # Tags configuration
   tags = {
