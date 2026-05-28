@@ -11,7 +11,6 @@ module "alb" {
   enable_https_listener  = var.enable_https_listener
   subnet_ids             = data.terraform_remote_state.network.outputs.public_subnet_ids
   source_ingress_sg_cidr = var.source_ingress_sg_cidr
-  enable_cloudwatch      = var.alb_enable_cloudwatch
 
   target_groups = {
     be = {
@@ -75,7 +74,6 @@ module "rds" {
   rds_port                              = var.rds_port
   rds_backup_retention_period           = var.rds_backup_retention_period
   performance_insights_retention_period = var.performance_insights_retention_period
-  enable_cloudwatch                     = var.rds_enable_cloudwatch
 
   rds_family        = var.rds_family
   aws_db_parameters = var.aws_db_parameters
@@ -101,7 +99,6 @@ module "redis" {
     module.ecs.ecs_tasks_sg_id
   ]
   redis_parameters     = var.redis_parameters
-  enable_cloudwatch    = var.redis_enable_cloudwatch
 }
 
 #-----------ECS------------#
@@ -113,7 +110,6 @@ module "ecs" {
   lb_sg_id         = module.alb.lb_sg_id
   target_group_arn = module.alb.tg_arns["be"]
   subnets          = data.terraform_remote_state.network.outputs.private_subnet_ids
-  enable_cloudwatch = var.ecs_enable_cloudwatch
   task_definitions = {
     "be" = {
       container_name       = var.ecs_task_definitions.be.container_name
