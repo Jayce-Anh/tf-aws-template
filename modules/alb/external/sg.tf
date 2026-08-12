@@ -1,26 +1,24 @@
 ########################### LOAD BALANCER SECURITY GROUP ###########################
+
 resource "aws_security_group" "sg_lb" {
-  name        = "${var.project.env}-${var.project.name}-${var.lb_name}-sg"
-  description = "SG of ALB"
-  vpc_id      = var.vpc_id
+  name        = "${var.project.env}-${var.project.name}-external"
+  description = "SG of external ALB"
+  vpc_id      = var.alb_vpc_id
 
   ingress {
     from_port   = 80
     to_port     = 80
-    protocol    = "TCP"
+    protocol    = "tcp"
     description = "Allow HTTP from internet"
-    cidr_blocks = var.source_ingress_sg_cidr
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  dynamic "ingress" {
-    for_each = var.dns_cert_arn != null ? [1] : []
-    content {
-      from_port   = 443
-      to_port     = 443
-      protocol    = "TCP"
-      description = "Allow HTTPS from internet"
-      cidr_blocks = var.source_ingress_sg_cidr
-    }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    description = "Allow HTTPS from internet"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -31,6 +29,6 @@ resource "aws_security_group" "sg_lb" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-${var.lb_name}-sg"
+    Name = "${var.project.env}-${var.project.name}-external"
   })
 }

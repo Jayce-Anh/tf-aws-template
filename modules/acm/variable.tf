@@ -1,24 +1,18 @@
+############################# ACM VARIABLE ##############################
+
+#=============== Project ================#
 variable "project" {
   type = object({
-    env = string
-    name = string
-    region = string
-    account_ids = list(string)
+    name       = string
+    env        = string
+    region     = string
+    account_id = string
+    domain     = string
   })
+  description = "Project configuration"
 }
 
 variable "tags" {
-  type = object({
-    Name = string
-    env = string
-  })
+  type        = map(string)
+  description = "Tags to apply to the ACM certificates"
 }
-
-variable "region" {
-  type = string
-}
-
-variable "domain" {
-  type = string
-}
-

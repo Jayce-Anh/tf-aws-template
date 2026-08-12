@@ -1,59 +1,33 @@
-######################## ALB ########################
+######################## VARIABLES ########################
+
+#================ Project =================#
 variable "project" {
   type = object({
-    name        = string
-    env         = string
-    region      = string
-    account_ids = list(string)
+    name   = string
+    env    = string
+    domain = string
   })
+  description = "Project configuration"
 }
 
 variable "tags" {
-  type = object({
-    Name = string
-  })
+  type        = map(string)
+  description = "Common tags applied to all resources"
 }
 
-variable "vpc_id" {
-  type = string
+#================ VPC =================#
+variable "alb_vpc_id" {
+  type        = string
+  description = "VPC ID for the ALB"
 }
 
-variable "subnet_ids" {
-  type = list(string)
+variable "alb_subnet_ids" {
+  type        = list(string)
+  description = "Public subnet IDs for the ALB"
 }
 
-variable "dns_cert_arn" {
-  type    = string
-  default = null
+#================ DNS =================#
+variable "alb_dns_cert" {
+  type        = string
+  description = "ACM certificate ARN for the HTTPS listener"
 }
-
-variable "enable_https_listener" {
-  type        = bool
-  default     = false
-  description = "Enable HTTPS listener (requires dns_cert_arn)"
-}
-
-variable "source_ingress_sg_cidr" {
-  type = list(string)
-}
-
-variable "lb_name" {
-  type = string
-}
-
-#----------------------- Target Group -----------------------
-
-variable "target_groups" {
-  description = "Map of target groups to create"
-  type = map(object({
-    name              = string
-    service_port      = number
-    health_check_path = string
-    priority          = number
-    host_header       = string
-    target_type       = optional(string, "instance")
-    ec2_id            = optional(string, null)
-  }))
-  default = {}
-}
-

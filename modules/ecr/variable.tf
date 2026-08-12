@@ -1,23 +1,20 @@
+############################ ECR VARIABLE ############################
+
+#================ Project =================#
 variable "project" {
   type = object({
-    name       = string
-    env        = string
-    region     = string
-    account_ids = list(string)
+    name = string
+    env  = string
   })
+  description = "Project metadata (env, name)"
 }
 
 variable "tags" {
-  type = object({
-    Name = string
-  })
+  type        = map(string)
+  description = "Common tags applied to all resources"
 }
 
-variable "source_services" {
-  type = set(string)
-}
-
-variable "s3_force_del" {
-  type        = bool
-  description = "Force destroy the ECR repository"
+variable "ecr_kms_key" {
+  type        = string
+  description = "KMS key ARN for ECR image encryption"
 }

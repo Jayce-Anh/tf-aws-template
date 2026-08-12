@@ -1,101 +1,37 @@
+############################## VARIABLES ##############################
+
+#========== Project ==========#
 variable "project" {
   type = object({
-    name        = string
-    env         = string
-    region      = string
-    account_ids = list(string)
+    name   = string
+    env    = string
+    region = string
   })
+  description = "Project configuration"
 }
 
 variable "tags" {
-  type = object({
-    Name = string
-  })
-}
-
-variable "rds_name" {
-  type = string
-}
-
-variable "multi_az" {
-  description = "If set to true, RDS instance is multi-AZ"
-  type        = bool
-}
-
-variable "rds_class" {
-  type = string
-}
-
-variable "rds_storage" {
-  type = string
-}
-
-variable "rds_max_storage" {
-  type = string
-}
-
-variable "rds_storage_type" {
-  type = string
-}
-
-variable "rds_iops" {
-  type = number
-}
-
-variable "rds_throughput" {
-  type = number
-}
-
-variable "rds_family" {
-  type = string
-}
-
-variable "rds_engine" {
-  type = string
-}
-
-variable "rds_engine_version" {
-  type = string
-}
-
-variable "rds_port" {
-  type = string
-}
-variable "rds_username" {
-  type = string
-}
-
-variable "rds_password" {
-  type      = string
-  sensitive = true
-}
-
-variable "rds_backup_retention_period" {
-  type = number
-}
-
-variable "performance_insights_retention_period" {
-  type = number
-}
-
-variable "aws_db_parameters" {
   type        = map(string)
-  description = "Custom parameters for RDS instance"
+  description = "Common tags applied to all resources"
 }
 
-variable "allowed_sg_ids_access_rds" {
-  type = list(string)
-}
-
-variable "db_name" {
+#============== RDS ==============#
+variable "rds_vpc_id" {
   type        = string
-  description = "Name of the database when creating the instance"
+  description = "VPC ID"
 }
 
-variable "subnet_ids" {
-  type = list(string)
+variable "rds_subnet_ids" {
+  type        = list(string)
+  description = "List of subnet IDs for the RDS subnet group"
 }
 
-variable "vpc_id" {
-  type = string
+variable "rds_allowed_sg" {
+  type        = list(string)
+  description = "List of allowed security group IDs to RDS instance"
+}
+
+variable "rds_kms_key" {
+  type        = string
+  description = "KMS key ARN"
 }
