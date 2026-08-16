@@ -428,6 +428,7 @@ resource "aws_iam_role_policy" "karpenter" {
           "ec2:CreateLaunchTemplate", "ec2:DeleteLaunchTemplate",
           "ec2:RunInstances", "ec2:TerminateInstances",
           "ec2:DescribeInstances", "ec2:DescribeInstanceTypes",
+          "ec2:DescribeInstanceTypeOfferings",
           "ec2:DescribeSubnets", "ec2:DescribeSecurityGroups",
           "ec2:DescribeLaunchTemplates", "ec2:DescribeSpotPriceHistory",
           "ec2:CreateTags", "ec2:DeleteTags",

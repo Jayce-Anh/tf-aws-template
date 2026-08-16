@@ -1,22 +1,25 @@
 ####################### ARGOCD HELM RELEASE #######################
 
+#================= Password =================#
 resource "htpasswd_password" "argocd" {
   password = jsondecode(aws_secretsmanager_secret_version.addons.secret_string).argocd_password
 }
 
+#================= Time =================#
 resource "time_static" "argocd_admin_password_mtime" {
   triggers = {
     hash = htpasswd_password.argocd.bcrypt
   }
 }
 
+#================= Helm Release =================#
 resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
   namespace        = "argocd"
   create_namespace = true
-  timeout          = 120
+  timeout          = 300
   wait             = true
 
   set = [
@@ -26,7 +29,7 @@ resource "helm_release" "argocd" {
     },
     {
       name  = "configs.params.server\\.insecure"
-      value = "true"
+      value = "false"
     },
     {
       name  = "server.ingress.enabled"
@@ -34,7 +37,27 @@ resource "helm_release" "argocd" {
     },
     {
       name  = "configs.cm.url"
-      value = "https://argocd.${var.project.name}.jayce-lab.works"
+      value = "https://argocd.${var.project.env}-${var.project.name}.${var.project.domain}"
+    },
+    {
+      name  = "server.certificate.enabled"
+      value = "true"
+    },
+    {
+      name  = "server.certificate.domain"
+      value = "argocd.${var.project.env}-${var.project.name}.${var.project.domain}"
+    },
+    {
+      name  = "server.certificate.issuer.group"
+      value = "cert-manager.io"
+    },
+    {
+      name  = "server.certificate.issuer.kind"
+      value = "ClusterIssuer"
+    },
+    {
+      name  = "server.certificate.issuer.name"
+      value = "selfsigned-issuer"
     },
     {
       name  = "configs.secret.argocdServerAdminPasswordMtime"
@@ -50,15 +73,17 @@ resource "helm_release" "argocd" {
   ]
 
   depends_on = [
+    terraform_data.eks_nodes,
     helm_release.load_balancer_controller,
     helm_release.cert_manager,
-    kubectl_manifest.cert_manager_cluster_issuer,
+    kubernetes_manifest.cert_manager_cluster_issuer,
     aws_iam_role.argocd,
     aws_eks_pod_identity_association.argocd,
     aws_secretsmanager_secret_version.addons,
   ]
 }
 
+#================= Secret =================#
 resource "kubernetes_secret_v1" "argocd_repo" {
   metadata {
     name      = "argocd-repo-creds"
@@ -70,20 +95,17 @@ resource "kubernetes_secret_v1" "argocd_repo" {
 
   data = {
     type     = "git"
-    url      = "https://gitlab.com/shopping-cart796042412/devops/shoppingcart-manifest.git"
+    url      = var.helm_repo_url
     username = "oauth2"
-    password = aws_secretsmanager_secret_version.helm-git-token.secret_string
+    password = data.aws_secretsmanager_secret_version.helm_git_token.secret_string
   }
 
   depends_on = [helm_release.argocd]
 }
 
 #============ ArgoCD Target Group Binding =============#
-# server.insecure=true → service port 80 (matches old insecure mode)
-resource "kubectl_manifest" "argocd_tgb" {
-  provider = kubectl
-
-  yaml_body = yamlencode({
+resource "kubernetes_manifest" "argocd_tgb" {
+  manifest = {
     apiVersion = "elbv2.k8s.aws/v1beta1"
     kind       = "TargetGroupBinding"
     metadata = {
@@ -93,12 +115,16 @@ resource "kubectl_manifest" "argocd_tgb" {
     spec = {
       serviceRef = {
         name = "argocd-server"
-        port = 80
+        port = 443
       }
       targetGroupARN = "${var.helm_argocd_tg_arn}"
       targetType     = "ip"
     }
-  })
+  }
+
+  timeouts {
+    delete = "5m"
+  }
 
   depends_on = [
     helm_release.argocd,
@@ -106,17 +132,13 @@ resource "kubectl_manifest" "argocd_tgb" {
   ]
 }
 
-resource "kubectl_manifest" "argocd_root_application" {
-  provider = kubectl
-
-  yaml_body = <<YAML
+resource "kubernetes_manifest" "argocd_root_application" {
+  manifest = yamldecode(<<YAML
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: argocd
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -131,6 +153,7 @@ spec:
       prune: true
       selfHeal: true
 YAML
+  )
 
   depends_on = [
     helm_release.argocd,

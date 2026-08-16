@@ -8,7 +8,7 @@ resource "aws_scheduler_schedule" "stop" {
     mode = "OFF"
   }
 
-  schedule_expression          = "cron(0 18 * * ? *)" # 6:00 PM
+  schedule_expression          = "cron(0 12 * * ? *)" # 12:00 PM
   schedule_expression_timezone = "Asia/Singapore"
 
   target {

@@ -40,6 +40,7 @@ resource "aws_elasticache_replication_group" "cache" {
 
   auto_minor_version_upgrade = false
   apply_immediately          = true
+  automatic_failover_enabled = true
 
   snapshot_window          = "00:30-01:30"
   snapshot_retention_limit = 7

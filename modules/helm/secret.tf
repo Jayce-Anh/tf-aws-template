@@ -22,9 +22,10 @@ resource "aws_secretsmanager_secret" "helm-addon" {
 resource "aws_secretsmanager_secret_version" "addons" {
   secret_id = aws_secretsmanager_secret.helm-addon.id
   secret_string = jsonencode({
-    elastic_password = "${random_password.addons["elastic"].result}"
-    grafana_password = "${random_password.addons["grafana"].result}"
-    argocd_password  = "${random_password.addons["argocd"].result}"
+    elastic_password  = "${random_password.addons["elastic"].result}"
+    grafana_password  = "${random_password.addons["grafana"].result}"
+    argocd_password   = "${random_password.addons["argocd"].result}"
+    slack_webhook_url = "replace-me-with-slack-webhook-url"
   })
 }
 
@@ -43,4 +44,13 @@ resource "aws_secretsmanager_secret" "helm-git-token" {
 resource "aws_secretsmanager_secret_version" "helm-git-token" {
   secret_id     = aws_secretsmanager_secret.helm-git-token.id
   secret_string = "replace-me-with-gitlab-token"
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+# Always read the latest token from Secrets Manager
+data "aws_secretsmanager_secret_version" "helm_git_token" {
+  secret_id = aws_secretsmanager_secret.helm-git-token.id
 }

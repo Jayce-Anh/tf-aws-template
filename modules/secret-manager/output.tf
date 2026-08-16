@@ -10,6 +10,7 @@ output "secret_id" {
 output "secret_arn" {
   value = {
     gitlab-runner-token = "${aws_secretsmanager_secret.gitlab-runner.arn}"
+    rds-credentials     = "${aws_secretsmanager_secret.rds.arn}"
   }
   description = "Map of secret ARNs"
 }

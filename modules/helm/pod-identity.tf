@@ -16,6 +16,7 @@ data "aws_iam_policy_document" "pod_identity_trust" {
 }
 
 #================= Role =================#
+# External Secrets
 resource "aws_iam_role" "external_secrets" {
   name               = "${var.project.env}-${var.project.name}-external-secrets"
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
@@ -25,6 +26,7 @@ resource "aws_iam_role" "external_secrets" {
   })
 }
 
+# Inventory
 resource "aws_iam_role" "pod_identity_inventory" {
   name               = "${var.project.env}-${var.project.name}-inventory-pod-identity"
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
@@ -34,6 +36,7 @@ resource "aws_iam_role" "pod_identity_inventory" {
   })
 }
 
+# Order
 resource "aws_iam_role" "pod_identity_order" {
   name               = "${var.project.env}-${var.project.name}-order-pod-identity"
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
@@ -44,6 +47,7 @@ resource "aws_iam_role" "pod_identity_order" {
 }
 
 #================= Policy =================#
+# External Secrets
 resource "aws_iam_role_policy" "external_secrets" {
   name = "${var.project.env}-${var.project.name}-external-secrets"
   role = aws_iam_role.external_secrets.id
@@ -57,6 +61,7 @@ resource "aws_iam_role_policy" "external_secrets" {
         Resource = [
           "${aws_secretsmanager_secret.helm-addon.arn}",
           "${aws_secretsmanager_secret.helm-git-token.arn}",
+          "${var.helm_rds_secret_arn}"
         ]
       },
       {
@@ -71,6 +76,7 @@ resource "aws_iam_role_policy" "external_secrets" {
   })
 }
 
+# Inventory
 resource "aws_iam_role_policy" "inventory_sqs" {
   name = "${var.project.env}-${var.project.name}-inventory-sqs"
   role = aws_iam_role.pod_identity_inventory.id
@@ -94,6 +100,7 @@ resource "aws_iam_role_policy" "inventory_sqs" {
   })
 }
 
+# Order
 resource "aws_iam_role_policy" "order_sqs" {
   name = "${var.project.env}-${var.project.name}-order-sqs"
   role = aws_iam_role.pod_identity_order.id

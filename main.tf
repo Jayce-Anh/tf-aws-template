@@ -10,17 +10,19 @@ module "hosted_zone" {
 
 #================= ACM Certificate =================#
 module "acm" {
-  source  = "./modules/acm"
-  project = var.project
-  tags    = var.tags
+  source             = "./modules/acm"
+  project            = var.project
+  tags               = var.tags
+  acm_hosted_zone_id = module.hosted_zone.hosted_zone_id
 }
 
 #================= Secret Manager =================#
 module "secret_manager" {
-  source         = "./modules/secret-manager"
-  project        = var.project
-  tags           = var.tags
-  secret_kms_key = module.kms.key_arn
+  source          = "./modules/secret-manager"
+  project         = var.project
+  tags            = var.tags
+  secret_kms_key  = module.kms.key_arn
+  rds_credentials = module.rds.rds_credentials
 }
 
 #================ VPC =================#
@@ -52,7 +54,7 @@ module "gitlab_runner" {
 
 #================= External ALB =================#
 module "alb" {
-  source         = "./modules/alb/external"
+  source         = "./modules/alb"
   project        = var.project
   tags           = var.tags
   alb_vpc_id     = module.vpc.vpc_id
@@ -62,10 +64,11 @@ module "alb" {
 
 #================= CloudFront =================#
 module "cloudfront" {
-  source          = "./modules/cloudfront/path-base-routing"
-  project         = var.project
-  tags            = var.tags
-  cf_alb_dns_name = module.alb.lb_dns_name
+  source            = "./modules/cloudfront"
+  project           = var.project
+  tags              = var.tags
+  cf_alb_dns_name   = module.alb.lb_dns_name
+  cf_hosted_zone_id = module.hosted_zone.hosted_zone_id
 }
 
 #================= KMS =================#
@@ -116,7 +119,9 @@ module "eks" {
   eks_allowed_sg = [module.bastion.sg_id, module.gitlab_runner.sg_id]
   eks_alb_sg_id  = module.alb.lb_sg_id
   eks_admin_access = {
-    gitlab_runner = module.gitlab_runner.ci_provider_role_arn
+    bastion       = module.bastion.role_arn
+    gitlab_ci     = module.gitlab_runner.ci_provider_role_arn
+    gitlab_runner = module.gitlab_runner.role_arn
     admin_user    = data.aws_iam_user.admin_user.arn
   }
 }
@@ -132,7 +137,8 @@ module "helm" {
   helm_repo_url           = var.helm_repo
   helm_argocd_tg_arn      = module.alb.tg_arns["argocd"]
   helm_sqs_queue_arn      = module.sqs.sqs_queue_arn
-  depends_on              = [module.eks, module.sqs, module.alb]
+  helm_rds_secret_arn     = module.secret_manager.secret_arn["rds-credentials"]
+  helm_eks_node_group_id  = module.eks.node_group_id
 }
 
 #================= SQS =================#

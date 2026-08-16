@@ -15,10 +15,6 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0"
     }
-    kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = ">= 1.19.0"
-    }
     time = {
       source  = "hashicorp/time"
       version = ">= 0.9"
@@ -30,14 +26,6 @@ terraform {
     htpasswd = {
       source  = "loafoe/htpasswd"
       version = ">= 1.0"
-    }
-    tls = {
-      source  = "hashicorp/tls"
-      version = ">= 3.0"
-    }
-    cloudinit = {
-      source  = "hashicorp/cloudinit"
-      version = ">= 2.0"
     }
   }
 }

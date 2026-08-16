@@ -101,7 +101,7 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.cloudfront.arn
+    acm_certificate_arn = aws_acm_certificate_validation.cloudfront.certificate_arn
     ssl_support_method  = "sni-only"
   }
 
@@ -123,4 +123,19 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
   tags = merge(var.tags, {
     Name = "${var.project.env}-${var.project.name}-cloudfront"
   })
+}
+
+#==================== Route53 Alias Record ====================#
+resource "aws_route53_record" "cloudfront" {
+  for_each = toset(["A", "AAAA"])
+
+  zone_id = var.cf_hosted_zone_id
+  name    = "${var.project.env}-${var.project.name}.${var.project.domain}"
+  type    = each.value
+
+  alias {
+    name                   = aws_cloudfront_distribution.cf_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cf_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
 }

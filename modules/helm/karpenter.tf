@@ -2,12 +2,12 @@
 
 #=============== Interruption Queue ===============#
 resource "aws_sqs_queue" "karpenter" {
-  name                      = var.helm_eks_cluster
+  name                      = "${var.project.name}-karpenter-node-interruption"
   message_retention_seconds = 300
   sqs_managed_sse_enabled   = true
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-karpenter"
+    Name = "${var.project.env}-${var.project.name}-karpenter-node-interruption"
   })
 }
 
@@ -44,12 +44,12 @@ resource "aws_cloudwatch_event_rule" "karpenter" {
     }
   }
 
-  name          = "${var.helm_eks_cluster}-${each.key}"
+  name          = "${var.helm_eks_cluster}-karpenter-node-interruption-${each.key}"
   description   = each.value.description
   event_pattern = jsonencode(each.value.event_pattern)
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-karpenter-${each.key}"
+    Name = "${var.project.env}-${var.project.name}-karpenter-node-interruption-${each.key}"
   })
 }
 
@@ -78,7 +78,7 @@ resource "helm_release" "karpenter" {
     },
     {
       name  = "settings.interruptionQueue"
-      value = "${var.helm_eks_cluster}"
+      value = "${var.project.name}-karpenter-node-interruption"
     },
     {
       name  = "controller.resources.requests.cpu"
@@ -101,6 +101,7 @@ resource "helm_release" "karpenter" {
   timeout = 300
 
   depends_on = [
+    terraform_data.eks_nodes,
     aws_iam_role.karpenter,
     aws_eks_pod_identity_association.karpenter,
     aws_sqs_queue_policy.karpenter,

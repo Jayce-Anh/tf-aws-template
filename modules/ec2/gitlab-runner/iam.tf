@@ -27,55 +27,6 @@ resource "aws_iam_role_policy_attachment" "ecr" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
-resource "aws_iam_role_policy" "secretsmanager" {
-  name = "${var.project.env}-${var.project.name}-gitlab-runner-secretsmanager"
-  role = aws_iam_role.runner.name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = ["secretsmanager:GetSecretValue"]
-        Resource = "arn:aws:secretsmanager:${var.project.region}:${var.project.account_id}:secret:${var.project.env}-${var.project.name}-*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "eks" {
-  name = "${var.project.env}-${var.project.name}-gitlab-runner-eks"
-  role = aws_iam_role.runner.name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = ["eks:DescribeCluster", "eks:ListClusters"]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-# Assume the Gitlab CI provider role
-resource "aws_iam_role_policy" "assume_ci_provider" {
-  name = "${var.project.env}-${var.project.name}-gitlab-runner-assume-ci"
-  role = aws_iam_role.runner.name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = ["sts:AssumeRole"]
-        Resource = "${aws_iam_role.ci_provider.arn}"
-      }
-    ]
-  })
-}
-
 #================= Gitlab Runner Instance Profile ==================#
 resource "aws_iam_instance_profile" "runner" {
   name = "${var.project.env}-${var.project.name}-gitlab-runner"
