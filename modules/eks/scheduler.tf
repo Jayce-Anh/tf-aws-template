@@ -20,7 +20,7 @@ resource "aws_autoscaling_schedule" "down" {
   min_size               = 0
   max_size               = 0
   desired_capacity       = 0
-  recurrence             = "0 12 * * *" 
+  recurrence             = "0 12 * * *"
   time_zone              = "Asia/Singapore"
   autoscaling_group_name = aws_eks_node_group.node_group.resources[0].autoscaling_groups[0].name
 

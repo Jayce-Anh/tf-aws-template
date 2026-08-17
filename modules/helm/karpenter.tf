@@ -7,7 +7,8 @@ resource "aws_sqs_queue" "karpenter" {
   sqs_managed_sse_enabled   = true
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-karpenter-node-interruption"
+    Name   = "${var.project.env}-${var.project.name}-karpenter-node-interruption"
+    Module = "${path.module}"
   })
 }
 
@@ -49,7 +50,8 @@ resource "aws_cloudwatch_event_rule" "karpenter" {
   event_pattern = jsonencode(each.value.event_pattern)
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-karpenter-node-interruption-${each.key}"
+    Name   = "${var.project.env}-${var.project.name}-karpenter-node-interruption-${each.key}"
+    Module = "${path.module}"
   })
 }
 

@@ -21,6 +21,7 @@ resource "aws_security_group" "sg" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-valkey"
+    Name   = "${var.project.env}-${var.project.name}-valkey"
+    Module = "${path.module}"
   })
 }

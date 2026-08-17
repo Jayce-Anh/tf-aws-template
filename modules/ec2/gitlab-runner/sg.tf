@@ -6,7 +6,8 @@ resource "aws_security_group" "runner" {
   name        = "${var.project.env}-${var.project.name}-gitlab-runner"
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-gitlab-runner"
+    Name   = "${var.project.env}-${var.project.name}-gitlab-runner"
+    Module = "${path.module}"
   })
 }
 

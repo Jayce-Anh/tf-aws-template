@@ -10,6 +10,7 @@ resource "aws_sqs_queue" "queue" {
   kms_master_key_id          = var.sqs_kms_key
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-order-events"
+    Name   = "${var.project.env}-${var.project.name}-order-events"
+    Module = "${path.module}"
   })
 }

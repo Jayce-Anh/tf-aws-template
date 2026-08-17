@@ -7,7 +7,8 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}"
+    Name   = "${var.project.env}-${var.project.name}"
+    Module = "${path.module}"
   })
 }
 
@@ -25,8 +26,9 @@ resource "aws_subnet" "public-1" {
   cidr_block              = cidrsubnet(aws_vpc.vpc.cidr_block, 8, 1) # 10.0.1.0/24
   depends_on              = [aws_internet_gateway.igw]
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-public-${local.azs[0]}"
-    AZ   = "${local.azs[0]}"
+    Name   = "${var.project.env}-${var.project.name}-public-${local.azs[0]}"
+    AZ     = "${local.azs[0]}"
+    Module = "${path.module}"
   })
 }
 
@@ -37,8 +39,9 @@ resource "aws_subnet" "public-2" {
   cidr_block              = cidrsubnet(aws_vpc.vpc.cidr_block, 8, 2) # 10.0.2.0/24
   depends_on              = [aws_internet_gateway.igw]
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-public-${local.azs[1]}"
-    AZ   = "${local.azs[1]}"
+    Name   = "${var.project.env}-${var.project.name}-public-${local.azs[1]}"
+    AZ     = "${local.azs[1]}"
+    Module = "${path.module}"
   })
 }
 
@@ -49,8 +52,9 @@ resource "aws_subnet" "private-1" {
   map_public_ip_on_launch = false
   cidr_block              = cidrsubnet(aws_vpc.vpc.cidr_block, 8, 3) # 10.0.3.0/24
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-private-${local.azs[0]}"
-    AZ   = "${local.azs[0]}"
+    Name   = "${var.project.env}-${var.project.name}-private-${local.azs[0]}"
+    AZ     = "${local.azs[0]}"
+    Module = "${path.module}"
   })
 }
 
@@ -60,8 +64,9 @@ resource "aws_subnet" "private-2" {
   map_public_ip_on_launch = false
   cidr_block              = cidrsubnet(aws_vpc.vpc.cidr_block, 8, 4) # 10.0.4.0/24
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-private-${local.azs[1]}"
-    AZ   = "${local.azs[1]}"
+    Name   = "${var.project.env}-${var.project.name}-private-${local.azs[1]}"
+    AZ     = "${local.azs[1]}"
+    Module = "${path.module}"
   })
 }
 
@@ -69,7 +74,8 @@ resource "aws_subnet" "private-2" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}"
+    Name   = "${var.project.env}-${var.project.name}"
+    Module = "${path.module}"
   })
 }
 
@@ -81,7 +87,8 @@ resource "aws_eip" "nat" {
     prevent_destroy = true
   }
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-nat"
+    Name   = "${var.project.env}-${var.project.name}-nat"
+    Module = "${path.module}"
   })
 }
 
@@ -91,7 +98,8 @@ resource "aws_nat_gateway" "nat-gw" {
   subnet_id     = aws_subnet.public-1.id
   depends_on    = [aws_internet_gateway.igw]
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}"
+    Name   = "${var.project.env}-${var.project.name}"
+    Module = "${path.module}"
   })
 }
 
@@ -106,7 +114,8 @@ resource "aws_route_table" "public-rt" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-public"
+    Name   = "${var.project.env}-${var.project.name}-public"
+    Module = "${path.module}"
   })
 }
 
@@ -120,7 +129,8 @@ resource "aws_route_table" "private-rt" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-private"
+    Name   = "${var.project.env}-${var.project.name}-private"
+    Module = "${path.module}"
   })
 }
 

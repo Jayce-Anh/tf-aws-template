@@ -17,7 +17,8 @@ resource "aws_elasticache_parameter_group" "parameter_group" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-valkey"
+    Name   = "${var.project.env}-${var.project.name}-valkey"
+    Module = "${path.module}"
   })
 }
 
@@ -40,13 +41,13 @@ resource "aws_elasticache_replication_group" "cache" {
 
   auto_minor_version_upgrade = false
   apply_immediately          = true
-  automatic_failover_enabled = true
 
   snapshot_window          = "00:30-01:30"
   snapshot_retention_limit = 7
   maintenance_window       = "sat:04:30-sat:05:30"
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-valkey"
+    Name   = "${var.project.env}-${var.project.name}-valkey"
+    Module = "${path.module}"
   })
 }

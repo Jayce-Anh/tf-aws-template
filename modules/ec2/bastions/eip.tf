@@ -3,7 +3,8 @@
 resource "aws_eip" "bastion" {
   domain = "vpc"
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-bastion-eip"
+    Name   = "${var.project.env}-${var.project.name}-bastion-eip"
+    Module = "${path.module}"
   })
 }
 

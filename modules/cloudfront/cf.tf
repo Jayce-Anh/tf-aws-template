@@ -121,7 +121,8 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
   depends_on = [aws_s3_bucket.s3]
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-cloudfront"
+    Name   = "${var.project.env}-${var.project.name}-cloudfront"
+    Module = "${path.module}"
   })
 }
 

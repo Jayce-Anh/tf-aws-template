@@ -1,23 +1,16 @@
 ################################### VARIABLES ###################################
 
 variable "project" {
-  type = object({
-    name       = string
-    env        = string
-    region     = string
-    account_id = string
-    domain     = string
-  })
+  type        = map(any)
   description = "Project configuration"
 }
 
 variable "tags" {
-  type        = map(string)
+  type        = map(any)
   description = "Common tags applied to all resources"
 }
 
 #=============== Helm =================#
-
 variable "helm_eks_cluster" {
   type        = string
   description = "EKS cluster name"
@@ -59,7 +52,17 @@ variable "helm_sqs_queue_arn" {
   description = "SQS queue ARN for inventory/order pod identity access"
 }
 
-variable "helm_rds_secret_arn" {
+variable "helm_rds_secret" {
   type        = string
   description = "ARN of the RDS credentials secret for External Secrets"
+}
+
+variable "helm_addon_secret" {
+  type        = string
+  description = "ARN of the Helm addon credentials secret"
+}
+
+variable "helm_git_token_secret" {
+  type        = string
+  description = "ARN of the Helm Git token secret"
 }

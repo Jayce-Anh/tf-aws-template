@@ -29,7 +29,8 @@ resource "aws_iam_role" "argocd" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-argocd"
+    Name   = "${var.project.env}-${var.project.name}-argocd"
+    Module = "${path.module}"
   })
 }
 
@@ -42,11 +43,11 @@ resource "aws_iam_role_policy" "argocd" {
     Statement = concat(
       [
         {
-          Effect   = "Allow"
-          Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+          Effect = "Allow"
+          Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
           Resource = [
-            "${aws_secretsmanager_secret.helm-addon.arn}",
-            "${aws_secretsmanager_secret.helm-git-token.arn}",
+            "${var.helm_addon_secret}",
+            "${var.helm_git_token_secret}",
           ]
         },
         {
@@ -61,7 +62,7 @@ resource "aws_iam_role_policy" "argocd" {
           "kms:Decrypt",
           "kms:DescribeKey",
         ]
-        Resource = var.helm_kms_key
+        Resource = "${var.helm_kms_key}"
       }],
     )
   })
@@ -296,7 +297,8 @@ resource "aws_iam_policy" "alb_controller" {
   })
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-alb-controller"
+    Name   = "${var.project.env}-${var.project.name}-alb-controller"
+    Module = "${path.module}"
   })
 }
 
@@ -305,7 +307,8 @@ resource "aws_iam_role" "alb_controller" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-alb-controller"
+    Name   = "${var.project.env}-${var.project.name}-alb-controller"
+    Module = "${path.module}"
   })
 }
 
@@ -343,7 +346,8 @@ resource "aws_iam_role" "cluster_autoscaler" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-cluster-autoscaler"
+    Name   = "${var.project.env}-${var.project.name}-cluster-autoscaler"
+    Module = "${path.module}"
   })
 }
 
@@ -411,7 +415,8 @@ resource "aws_iam_role" "karpenter" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-karpenter"
+    Name   = "${var.project.env}-${var.project.name}-karpenter"
+    Module = "${path.module}"
   })
 }
 
@@ -440,7 +445,7 @@ resource "aws_iam_role_policy" "karpenter" {
         Resource = "*"
       },
       {
-        Effect   = "Allow"
+        Effect = "Allow"
         Action = [
           "sqs:DeleteMessage",
           "sqs:GetQueueAttributes",

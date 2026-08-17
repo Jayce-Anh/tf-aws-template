@@ -2,17 +2,12 @@
 
 #================ Project =================#
 variable "project" {
-  type = object({
-    name        = string
-    env         = string
-    region      = string
-    account_id  = string
-  })
+  type        = map(any)
   description = "Project configuration"
 }
 
 variable "tags" {
-  type        = map(string)
+  type        = map(any)
   description = "Common tags applied to all resources"
 }
 
@@ -70,9 +65,9 @@ variable "env_vars_codedeploy" {
 #================ Code Pipeline =================#
 variable "git_config" {
   type = object({
-    token = optional(string, null),
-    org = string
-    repo = string
+    token  = optional(string, null),
+    org    = string
+    repo   = string
     branch = optional(string, null)
   })
   description = "Git configuration"

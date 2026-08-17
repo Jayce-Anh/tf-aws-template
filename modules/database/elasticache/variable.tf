@@ -2,15 +2,12 @@
 
 #============ Project ============#
 variable "project" {
-  type = object({
-    name = string
-    env  = string
-  })
+  type        = map(any)
   description = "Project configuration"
 }
 
 variable "tags" {
-  type        = map(string)
+  type        = map(any)
   description = "Common tags applied to all resources"
 }
 

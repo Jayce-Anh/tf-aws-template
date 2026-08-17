@@ -11,7 +11,8 @@ resource "aws_acm_certificate" "alb" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-alb"
+    Name   = "${var.project.env}-${var.project.name}-alb"
+    Module = "${path.module}"
   })
 }
 

@@ -22,7 +22,8 @@ resource "aws_iam_role" "external_secrets" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-external-secrets"  
+    Name   = "${var.project.env}-${var.project.name}-external-secrets"
+    Module = "${path.module}"
   })
 }
 
@@ -32,7 +33,8 @@ resource "aws_iam_role" "pod_identity_inventory" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-inventory-pod-identity"
+    Name   = "${var.project.env}-${var.project.name}-inventory-pod-identity"
+    Module = "${path.module}"
   })
 }
 
@@ -42,7 +44,8 @@ resource "aws_iam_role" "pod_identity_order" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-order-pod-identity"
+    Name   = "${var.project.env}-${var.project.name}-order-pod-identity"
+    Module = "${path.module}"
   })
 }
 
@@ -57,11 +60,11 @@ resource "aws_iam_role_policy" "external_secrets" {
     Statement = [
       {
         Effect = "Allow"
-        Action   = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
+        Action = ["secretsmanager:GetSecretValue", "secretsmanager:DescribeSecret"]
         Resource = [
-          "${aws_secretsmanager_secret.helm-addon.arn}",
-          "${aws_secretsmanager_secret.helm-git-token.arn}",
-          "${var.helm_rds_secret_arn}"
+          "${var.helm_addon_secret}",
+          "${var.helm_git_token_secret}",
+          "${var.helm_rds_secret}",
         ]
       },
       {

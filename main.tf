@@ -18,11 +18,11 @@ module "acm" {
 
 #================= Secret Manager =================#
 module "secret_manager" {
-  source          = "./modules/secret-manager"
-  project         = var.project
-  tags            = var.tags
-  secret_kms_key  = module.kms.key_arn
-  rds_credentials = module.rds.rds_credentials
+  source         = "./modules/secret-manager"
+  project        = var.project
+  tags           = var.tags
+  secret_kms_key = module.kms.key_arn
+  secret_rds     = module.rds.rds_credentials
 }
 
 #================ VPC =================#
@@ -80,10 +80,10 @@ module "kms" {
 
 #================= ECR =================#
 module "ecr" {
-  source       = "./modules/ecr"
-  project      = var.project
-  tags         = var.tags
-  ecr_kms_key  = module.kms.key_arn
+  source      = "./modules/ecr"
+  project     = var.project
+  tags        = var.tags
+  ecr_kms_key = module.kms.key_arn
 }
 
 #================= RDS =================#
@@ -128,23 +128,25 @@ module "eks" {
 
 #================= Helm =================#
 module "helm" {
-  source                  = "./modules/helm"
-  project                 = var.project
-  tags                    = var.tags
-  helm_eks_cluster        = module.eks.eks_cluster_name
-  helm_vpc_id             = module.vpc.vpc_id
-  helm_kms_key            = module.kms.key_arn
-  helm_repo_url           = var.helm_repo
-  helm_argocd_tg_arn      = module.alb.tg_arns["argocd"]
-  helm_sqs_queue_arn      = module.sqs.sqs_queue_arn
-  helm_rds_secret_arn     = module.secret_manager.secret_arn["rds-credentials"]
-  helm_eks_node_group_id  = module.eks.node_group_id
+  source                 = "./modules/helm"
+  project                = var.project
+  tags                   = var.tags
+  helm_eks_cluster       = module.eks.eks_cluster_name
+  helm_vpc_id            = module.vpc.vpc_id
+  helm_kms_key           = module.kms.key_arn
+  helm_repo_url          = var.helm_repo
+  helm_argocd_tg_arn     = module.alb.tg_arns["argocd"]
+  helm_sqs_queue_arn     = module.sqs.sqs_queue_arn
+  helm_rds_secret        = module.secret_manager.secret_arn["rds-credentials"]
+  helm_addon_secret      = module.secret_manager.secret_arn["helm-addon-credentials"]
+  helm_git_token_secret  = module.secret_manager.secret_arn["helm-git-token"]
+  helm_eks_node_group_id = module.eks.node_group_id
 }
 
 #================= SQS =================#
 module "sqs" {
-  source = "./modules/sqs"
-  project = var.project
-  tags = var.tags
+  source      = "./modules/sqs"
+  project     = var.project
+  tags        = var.tags
   sqs_kms_key = module.kms.key_arn
 }

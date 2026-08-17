@@ -67,7 +67,8 @@ resource "aws_iam_role" "ci_provider" {
   })
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-gitlab-ci-provider"
+    Name   = "${var.project.env}-${var.project.name}-gitlab-ci-provider"
+    Module = "${path.module}"
   })
 }
 
@@ -98,7 +99,8 @@ resource "aws_iam_role" "scheduler" {
   })
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-gitlab-runner-scheduler"
+    Name   = "${var.project.env}-${var.project.name}-gitlab-runner-scheduler"
+    Module = "${path.module}"
   })
 }
 

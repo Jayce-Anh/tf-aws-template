@@ -5,8 +5,9 @@ resource "aws_s3_bucket" "bucket_artifact" {
   bucket        = "${var.project.env}-${var.project.name}-codepipeline"
   force_destroy = true
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-codepipeline"
-    Env  = "${var.project.env}"
+    Name   = "${var.project.env}-${var.project.name}-codepipeline"
+    Env    = "${var.project.env}"
+    Module = "${path.module}"
   })
 }
 
@@ -63,7 +64,7 @@ resource "aws_codepipeline" "codepipeline" {
   #Conditional Deploy Stage (only for ECS deployments)
   stage {
     name = "Deploy"
-    
+
     action {
       name            = "Deploy"
       category        = "Deploy"

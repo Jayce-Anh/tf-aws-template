@@ -17,7 +17,8 @@ resource "aws_ecr_repository" "ecr" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-${each.key}"
+    Name   = "${var.project.env}-${var.project.name}-${each.key}"
+    Module = "${path.module}"
   })
 }
 

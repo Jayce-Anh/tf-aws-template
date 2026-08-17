@@ -43,6 +43,7 @@ resource "aws_eks_cluster" "eks" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-eks-cluster"
+    Name   = "${var.project.env}-${var.project.name}-eks-cluster"
+    Module = "${path.module}"
   })
 }

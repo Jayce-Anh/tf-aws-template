@@ -62,7 +62,8 @@ resource "aws_db_instance" "db" {
   maintenance_window      = "sun:04:00-sun:05:00"
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-rds"
+    Name   = "${var.project.env}-${var.project.name}-rds"
+    Module = "${path.module}"
   })
 }
 

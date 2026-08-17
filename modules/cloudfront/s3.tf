@@ -6,7 +6,8 @@ resource "aws_s3_bucket" "s3" {
   force_destroy = true
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-cloudfront"
+    Name   = "${var.project.env}-${var.project.name}-cloudfront"
+    Module = "${path.module}"
   })
 }
 

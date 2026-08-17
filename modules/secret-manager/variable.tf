@@ -2,30 +2,23 @@
 
 #================ Project =================#
 variable "project" {
-  type = object({
-    name = string
-    env  = string
-  })
+  type        = map(any)
   description = "Project configuration"
 }
 
 variable "tags" {
-  type        = map(string)
+  type        = map(any)
   description = "Common tags applied to all resources"
 }
 
-#================ KMS =================#
+#================ Secret ==================#
 variable "secret_kms_key" {
   type        = string
   description = "KMS key ARN to encrypt secrets"
 }
 
-variable "rds_credentials" {
-  type = object({
-    username = string
-    password = string
-    host     = string
-    port     = string
-  })
+variable "secret_rds" {
+  type        = map(any)
+  sensitive   = true
   description = "RDS credentials"
 }

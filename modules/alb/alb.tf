@@ -9,7 +9,8 @@ resource "aws_lb" "lb" {
   subnets            = var.alb_subnet_ids
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-external"
+    Name   = "${var.project.env}-${var.project.name}-external"
+    Module = "${path.module}"
   })
 }
 

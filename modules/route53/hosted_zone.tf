@@ -6,6 +6,7 @@ resource "aws_route53_zone" "hosted_zone" {
   force_destroy = true
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}"
+    Name   = "${var.project.env}-${var.project.name}"
+    Module = "${path.module}"
   })
 }

@@ -22,6 +22,7 @@ resource "aws_security_group" "sg_db" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-rds"
+    Name   = "${var.project.env}-${var.project.name}-rds"
+    Module = "${path.module}"
   })
 }

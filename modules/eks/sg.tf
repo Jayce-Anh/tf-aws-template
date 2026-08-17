@@ -15,7 +15,8 @@ resource "aws_security_group" "node_group" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-eks-node-group"
+    Name   = "${var.project.env}-${var.project.name}-eks-node-group"
+    Module = "${path.module}"
   })
 
   lifecycle {

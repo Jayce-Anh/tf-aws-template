@@ -31,7 +31,8 @@ resource "aws_instance" "bastion" {
   depends_on = [aws_security_group.bastion]
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-bastion"
+    Name   = "${var.project.env}-${var.project.name}-bastion"
+    Module = "${path.module}"
   })
 
   lifecycle {

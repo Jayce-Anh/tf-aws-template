@@ -7,7 +7,8 @@ resource "aws_kms_key" "kms" {
   deletion_window_in_days = 7
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-shared-key"
+    Name   = "${var.project.env}-${var.project.name}-shared-key"
+    Module = "${path.module}"
   })
 }
 

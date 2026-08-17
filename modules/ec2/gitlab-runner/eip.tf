@@ -3,7 +3,8 @@
 resource "aws_eip" "runner" {
   domain = "vpc"
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-gitlab-runner-eip"
+    Name   = "${var.project.env}-${var.project.name}-gitlab-runner-eip"
+    Module = "${path.module}"
   })
 }
 

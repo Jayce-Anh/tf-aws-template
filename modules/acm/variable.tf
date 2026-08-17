@@ -2,18 +2,12 @@
 
 #=============== Project ================#
 variable "project" {
-  type = object({
-    name       = string
-    env        = string
-    region     = string
-    account_id = string
-    domain     = string
-  })
+  type        = map(any)
   description = "Project configuration"
 }
 
 variable "tags" {
-  type        = map(string)
+  type        = map(any)
   description = "Tags to apply to the ACM certificates"
 }
 

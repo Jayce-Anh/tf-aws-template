@@ -10,7 +10,8 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-cloudfront"
+    Name   = "${var.project.env}-${var.project.name}-cloudfront"
+    Module = "${path.module}"
   })
 }
 

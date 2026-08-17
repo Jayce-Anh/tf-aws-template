@@ -10,6 +10,7 @@ resource "aws_iam_openid_connect_provider" "gitlab" {
   thumbprint_list = [data.tls_certificate.gitlab.certificates[0].sha1_fingerprint]
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-gitlab"
+    Name   = "${var.project.env}-${var.project.name}-gitlab"
+    Module = "${path.module}"
   })
 }

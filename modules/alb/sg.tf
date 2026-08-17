@@ -29,6 +29,7 @@ resource "aws_security_group" "sg_lb" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-external"
+    Name   = "${var.project.env}-${var.project.name}-external"
+    Module = "${path.module}"
   })
 }

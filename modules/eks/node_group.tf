@@ -46,7 +46,8 @@ resource "aws_eks_node_group" "node_group" {
   ]
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-eks-node-group"
+    Name   = "${var.project.env}-${var.project.name}-eks-node-group"
+    Module = "${path.module}"
   })
 }
 
@@ -83,13 +84,15 @@ resource "aws_launch_template" "node_group" {
     tags = merge(var.tags, {
       Name           = "${var.project.env}-${var.project.name}-eks-node-group"
       LaunchTemplate = "${var.project.env}-${var.project.name}-eks-node-group"
+      Module         = "${path.module}"
     })
   }
 
   tag_specifications {
     resource_type = "volume"
     tags = merge(var.tags, {
-      Name = "${var.project.env}-${var.project.name}-eks-node-group"
+      Name   = "${var.project.env}-${var.project.name}-eks-node-group"
+      Module = "${path.module}"
     })
   }
 }

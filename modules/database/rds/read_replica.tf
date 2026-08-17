@@ -9,6 +9,7 @@ resource "aws_db_instance" "read_replica" {
   storage_encrypted      = aws_db_instance.db.storage_encrypted
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-read-replica"
+    Name   = "${var.project.env}-${var.project.name}-read-replica"
+    Module = "${path.module}"
   })
 }

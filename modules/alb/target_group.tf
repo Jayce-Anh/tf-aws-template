@@ -21,7 +21,8 @@ resource "aws_lb_target_group" "catalog" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-catalog"
+    Name   = "${var.project.env}-${var.project.name}-catalog"
+    Module = "${path.module}"
   })
 }
 
@@ -45,7 +46,8 @@ resource "aws_lb_target_group" "inventory" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-inventory"
+    Name   = "${var.project.env}-${var.project.name}-inventory"
+    Module = "${path.module}"
   })
 }
 
@@ -69,7 +71,8 @@ resource "aws_lb_target_group" "order" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-order"
+    Name   = "${var.project.env}-${var.project.name}-order"
+    Module = "${path.module}"
   })
 }
 
@@ -94,7 +97,8 @@ resource "aws_lb_target_group" "argocd" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-argocd"
+    Name   = "${var.project.env}-${var.project.name}-argocd"
+    Module = "${path.module}"
   })
 }
 
@@ -118,7 +122,8 @@ resource "aws_lb_target_group" "grafana" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-grafana"
+    Name   = "${var.project.env}-${var.project.name}-grafana"
+    Module = "${path.module}"
   })
 }
 
@@ -142,6 +147,7 @@ resource "aws_lb_target_group" "kibana" {
   }
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-kibana"
+    Name   = "${var.project.env}-${var.project.name}-kibana"
+    Module = "${path.module}"
   })
 }

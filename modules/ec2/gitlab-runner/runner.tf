@@ -23,7 +23,8 @@ resource "aws_instance" "runner" {
   depends_on = [aws_security_group.runner]
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-gitlab-runner"
+    Name   = "${var.project.env}-${var.project.name}-gitlab-runner"
+    Module = "${path.module}"
   })
 
   lifecycle {

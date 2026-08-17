@@ -16,7 +16,8 @@ resource "aws_iam_role" "scheduler" {
   })
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-rds-scheduler"
+    Name   = "${var.project.env}-${var.project.name}-rds-scheduler"
+    Module = "${path.module}"
   })
 }
 

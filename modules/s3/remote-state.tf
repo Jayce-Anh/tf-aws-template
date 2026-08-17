@@ -5,9 +5,10 @@ resource "aws_s3_bucket" "remote_state" {
   lifecycle {
     prevent_destroy = true
   }
-  tags = {
-    Name = "${var.project.env}-${var.project.name}-tf-state"
-  }
+  tags = merge(var.tags, {
+    Name   = "${var.project.env}-${var.project.name}-tf-state"
+    Module = "${path.module}"
+  })
 }
 
 resource "aws_s3_bucket_versioning" "remote_state" {

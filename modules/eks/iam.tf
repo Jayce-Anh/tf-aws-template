@@ -19,7 +19,8 @@ resource "aws_iam_role" "eks" {
   })
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-eks-cluster"
+    Name   = "${var.project.env}-${var.project.name}-eks-cluster"
+    Module = "${path.module}"
   })
 }
 
@@ -78,7 +79,8 @@ resource "aws_iam_role" "node_group" {
   })
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-eks-node-group"
+    Name   = "${var.project.env}-${var.project.name}-eks-node-group"
+    Module = "${path.module}"
   })
 }
 
@@ -182,7 +184,8 @@ resource "aws_iam_role" "ebs_csi_driver" {
   assume_role_policy = data.aws_iam_policy_document.pod_identity_trust.json
 
   tags = merge(var.tags, {
-    Name = "${var.project.env}-${var.project.name}-eks-csi-driver"
+    Name   = "${var.project.env}-${var.project.name}-eks-csi-driver"
+    Module = "${path.module}"
   })
 }
 
